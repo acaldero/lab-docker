@@ -1,0 +1,31 @@
+version: "3.5"
+
+networks:
+  b0:
+    driver: bridge
+
+services:
+  node:
+    build:
+      context: ./
+      dockerfile: ./docker/dockerfile
+      args:
+        UID: ${HOST_UID}
+        GID: ${HOST_GID}
+    image: lab
+    volumes:
+      - type: bind
+        source: .
+        target: /work
+      - type: bind
+        source: ./export
+        target: /export
+      - type: bind
+        source: /lib/modules
+        target: /lib/modules
+    networks:
+      - b0
+    privileged: true
+    cap_add:
+      - ALL
+

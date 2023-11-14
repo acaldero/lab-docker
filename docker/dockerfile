@@ -1,0 +1,104 @@
+ARG UBUNTU_VERSION=22.04
+FROM ubuntu:${UBUNTU_VERSION} AS base
+
+ARG UID
+ARG GID
+
+ENV DEBIAN_FRONTEND=noninteractive 
+
+# Install initial software
+RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
+        aptitude apt-utils \
+        zlib1g-dev ca-certificates pkg-config \
+        software-properties-common gpg-agent \
+        curl libcurl3-dev \
+        wget rsync \
+        sudo lshw \
+        vim \
+        \
+        build-essential \
+        autoconf cmake g++ git \
+        gdb valgrind strace \
+        nasm \
+        man-db doxygen \
+        htop lsof \
+        \
+        inetutils-ping \
+        netcat \
+        nmap net-tools hping3 \
+        iftop nload \
+        \
+        kmod \
+        nfs-common nfs-kernel-server \
+        \
+        libtool \
+	rpcbind \
+        default-jdk \
+	libjson-c-dev \
+        jq \
+        \
+        python3-minimal python3-pip \
+        \
+        zip unzip unrar p7zip-full p7zip-rar \
+        \
+        libmpich-dev libmpich12 mpich mpich-doc netpipe-mpich2 \
+        \
+        yamllint \
+        ubuntu-restricted-extras \
+        imagemagick \
+        && \
+    apt-get clean
+
+# tzdata: Configure region
+RUN echo "Europe/Madrid" > /etc/timezone
+
+# Set lab user as default user
+RUN addgroup --gid $GID lab && \
+    adduser  --uid $UID --gid $GID --disabled-password --gecos "" lab && \
+    echo 'lab ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+RUN echo 'lab:lab' | chpasswd
+
+
+# OpenSSH: Install
+RUN apt-get install -y --no-install-recommends openssh-client openssh-server
+RUN mkdir -p /var/run/sshd
+RUN mkdir -p  /home/lab/.ssh
+RUN chmod 700 /home/lab/.ssh
+
+# OpenSSH: Allow Root login
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+RUN sed -i 's/PermitRootLogin prohibit-password/#PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+# OpenSSH: Allow to talk to containers without asking for confirmation
+RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \
+    echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
+    mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config
+# OpenSSH: keygen
+RUN ssh-keygen -q -t rsa -N "" -f /home/lab/.ssh/id_rsa
+RUN cp /home/lab/.ssh/id_rsa.pub  /home/lab/.ssh/authorized_keys
+
+
+# Spark
+RUN mkdir -p /home/lab
+RUN wget https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz -O /home/lab/spark-3.5.tar.gz
+RUN tar zxf /home/lab/spark-3.5.tar.gz     -C /home/lab
+RUN ln -s   /home/lab/spark-3.5.0-bin-hadoop3 /home/lab/spark
+
+ RUN pip install py4j
+#RUN apt-get install jupyter-notebook
+
+RUN echo "export PATH=/home/lab/spark/bin:\$PATH"  >> /home/lab/.profile
+RUN mkdir -p /home/lab/bin
+ADD script /home/lab/bin
+RUN chmod a+x /home/lab/bin/*.sh
+
+
+# container start-up
+RUN mkdir -p /srv
+COPY docker/dockerstart.sh /srv
+RUN mkdir -p /work
+WORKDIR "/work"
+
+EXPOSE 22
+CMD ["/srv/dockerstart.sh"]
+
