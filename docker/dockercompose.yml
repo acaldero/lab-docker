@@ -7,7 +7,7 @@ networks:
 services:
   node:
     build:
-      context: ./
+      context: ../
       dockerfile: ./docker/dockerfile
       args:
         UID: ${HOST_UID}
@@ -15,10 +15,10 @@ services:
     image: lab
     volumes:
       - type: bind
-        source: .
+        source: ..
         target: /work
       - type: bind
-        source: ./export
+        source: ../export
         target: /export
       - type: bind
         source: /lib/modules

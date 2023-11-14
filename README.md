@@ -40,17 +40,23 @@
 </html>
 
   * To start:
-    * To start a work session with **2** containers, please execute:
-      *  ./lab.sh start **2**
+    * To start a work session with **3** containers, please execute:
+      *  ./lab.sh start **3**
     * To check the containers are running please use:
       *  ./lab.sh status
     * To get the containers internal IP address please use:
       *  ./lab.sh network
 
   * To work with some container:
-    * To get into container **1** out of 2 please execute:
+    * To get into container **1** out of 3 please execute:
       *  ./lab.sh bash **1**
-    * <some work inside container **1** at /work directory>
+    * example of some work inside container **1** at /work directory:
+      * su - lab
+      * ssh localhost sudo /work/script/hosts.sh
+      * ssh nodo2     sudo /work/script/hosts.sh
+      * ssh nodo3     sudo /work/script/hosts.sh
+      * ./data/eqdlm.sh
+      * exit
     * To exit from container **1** please use:
       *  exit
 

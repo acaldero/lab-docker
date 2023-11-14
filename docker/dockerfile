@@ -61,9 +61,9 @@ RUN echo 'lab:lab' | chpasswd
 
 # OpenSSH: Install
 RUN apt-get install -y --no-install-recommends openssh-client openssh-server
-RUN mkdir -p /var/run/sshd
-RUN mkdir -p  /home/lab/.ssh
-RUN chmod 700 /home/lab/.ssh
+RUN mkdir -p  /var/run/sshd
+RUN mkdir -p    /home/lab/.ssh
+RUN chmod 700   /home/lab/.ssh
 
 # OpenSSH: Allow Root login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
@@ -75,7 +75,10 @@ RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_confi
     mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config
 # OpenSSH: keygen
 RUN ssh-keygen -q -t rsa -N "" -f /home/lab/.ssh/id_rsa
-RUN cp /home/lab/.ssh/id_rsa.pub  /home/lab/.ssh/authorized_keys
+RUN ssh-keygen -q -t dsa -N "" -f /home/lab/.ssh/id_dsa
+RUN cat /home/lab/.ssh/id_dsa.pub >> /home/lab/.ssh/authorized_keys
+RUN cat /home/lab/.ssh/id_rsa.pub >> /home/lab/.ssh/authorized_keys
+RUN chown lab:lab /home/lab/.ssh
 
 
 # Spark
@@ -83,14 +86,17 @@ RUN mkdir -p /home/lab
 RUN wget https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz -O /home/lab/spark-3.5.tar.gz
 RUN tar zxf /home/lab/spark-3.5.tar.gz     -C /home/lab
 RUN ln -s   /home/lab/spark-3.5.0-bin-hadoop3 /home/lab/spark
-
- RUN pip install py4j
-#RUN apt-get install jupyter-notebook
-
 RUN echo "export PATH=/home/lab/spark/bin:\$PATH"  >> /home/lab/.profile
-RUN mkdir -p /home/lab/bin
-ADD script /home/lab/bin
-RUN chmod a+x /home/lab/bin/*.sh
+
+# Scripts
+RUN mkdir -p  /home/lab/bin /home/lab/data
+ADD script    /home/lab/bin
+ADD data      /home/lab/data
+RUN chmod a+x /home/lab/bin/*.sh /home/lab/data/*.sh
+RUN chown -R lab:lab /home/lab
+
+RUN pip install py4j
+RUN apt-get install -y jupyter-notebook
 
 
 # container start-up

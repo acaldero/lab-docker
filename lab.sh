@@ -86,7 +86,7 @@ do
 
 		# Start container cluster (single node)
 		echo "Building containers..."
-		HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose -f dockercompose.yml up -d --scale node=$1
+		HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose -f docker/dockercompose.yml up -d --scale node=$1
 		if [ $? -gt 0 ]; then
 		    echo ": The docker-compose command failed to spin up containers."
 		    echo ": * Did you execute git clone https://github.com/acaldero/lab-docker.git?."
@@ -125,7 +125,7 @@ do
 	     stop)
 		# Stopping containers
 		echo "Stopping containers..."
-		docker-compose -f dockercompose.yml down
+		HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose -f docker/dockercompose.yml down
 		if [ $? -gt 0 ]; then
 		    echo ": The docker-compose command failed to stop containers."
 		    echo ": * Did you execute git clone https://github.com/acaldero/lab-docker.git?."
@@ -135,7 +135,8 @@ do
 
 		# Remove container cluster (single node) files...
 		rm -fr machines
-		rm -fr hosts
+		rm -fr export/hosts
+		rm -fr export/names
 	     ;;
 
 	     status)
