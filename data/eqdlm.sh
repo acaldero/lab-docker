@@ -16,8 +16,8 @@ tail -n +2 /work/export/names > /home/lab/spark/conf/workers
 
 LIST=$(cat /home/lab/spark/conf/workers)
 for L in $LIST; do
-	echo ssh $L mkdir -p /home/lab/data
-	echo scp /home/lab/data/2000-0.txt $L:/home/lab/data/2000-0.txt
+    ssh $L mkdir -p /home/lab/data
+    scp /home/lab/data/2000-0.txt $L:/home/lab/data/2000-0.txt
 done
 
 

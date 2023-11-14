@@ -94,9 +94,19 @@ do
 		    exit
 		fi
 
-		# Container cluster (single node) files...
+		# Container cluster (single node) files: machines, hosts, and names
 		CONTAINER_ID_LIST=$(docker ps -f name=node -q)
 		docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $CONTAINER_ID_LIST > machines
+
+		echo -n "" > ./export/hosts
+		echo -n "" > ./export/names
+		I=1
+		while IFS= read -r line
+		do
+		  echo "$line nodo$I" >> ./export/hosts
+		  echo       "nodo$I" >> ./export/names
+		  I=$((I+1))
+		done < machines
 	     ;;
 
 	     bash)
@@ -180,17 +190,6 @@ do
 		    echo ": The machines file was not found."
 		    exit
 		fi
-
-		## U22
-		#docker container exec -it $CNAME     \
-		#       mpirun -np $NP -machinefile machines \
-		#	      --oversubscribe \
-		#	      -bind-to none -map-by slot -verbose --allow-run-as-root \
-		#	       -x LD_LIBRARY_PATH -x PATH \
-		#	       -x NCCL_SOCKET_IFNAME=^lo,docker0 \
-		#	       -mca pml ob1 -mca btl ^openib \
-		#	       -mca btl_tcp_if_exclude lo,docker0,eth1 \
-		#	      $A
 
 		# U22
 		docker container exec -it $CNAME     \

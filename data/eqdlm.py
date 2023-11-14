@@ -6,8 +6,10 @@ sc = SparkSession.builder.appName("pywc").master("spark://nodo1:7077").getOrCrea
 lines = sc.read.text("/home/lab/data/2000-0.txt").rdd.map(lambda r: r[0])
 counts = lines.flatMap(lambda x: x.split(' ')) \
               .map(lambda x: (x, 1)) \
-              .reduceByKey(add)
+              .reduceByKey(add) \
+              .sortBy(lambda x: x[1], False)
 output = counts.collect()
+print(counts.take(10))
 counts.saveAsTextFile("/home/lab/data/pg2000-w")
 sc.stop()
 quit()

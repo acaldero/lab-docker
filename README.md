@@ -18,7 +18,7 @@
   * First time + "each time u22-dockerfile is updated":
     * ./lab.sh build
 
-  * To start **3** containers:
+  * To start a work session with **3** containers, please execute:
     *  ./lab.sh start **3**
 
   * To get into container **2**:
@@ -27,42 +27,34 @@
   * Being within **2**, to exit:
     *  exit
 
-  * To stop the containers:
+  * To stop the work session please use:
     *  ./lab.sh stop
 
   * Available options for debugging:
-    *  ./lab.sh status
-    *  ./lab.sh network
+    * To check the containers are running please use:
+      * ./lab.sh status
+    * To get the containers internal IP address please use:
+      * ./lab.sh network
 
 <html>
   </td>
   <td>
 </html>
 
-  * To start:
-    * To start a work session with **3** containers, please execute:
-      *  ./lab.sh start **3**
-    * To check the containers are running please use:
-      *  ./lab.sh status
-    * To get the containers internal IP address please use:
-      *  ./lab.sh network
+  * To start **3** containers:
+    * ./lab.sh start **3**
+    * ./lab.sh status
 
-  * To work with some container:
-    * To get into container **1** out of 3 please execute:
-      *  ./lab.sh bash **1**
-    * example of some work inside container **1** at /work directory:
-      * su - lab
-      * ssh localhost sudo /work/script/hosts.sh
-      * ssh nodo2     sudo /work/script/hosts.sh
-      * ssh nodo3     sudo /work/script/hosts.sh
-      * ./data/eqdlm.sh
-      * exit
-    * To exit from container **1** please use:
-      *  exit
+  * Example of some work at container **1**:
+    * ./lab.sh bash **1**
+    * su - lab
+    * mpirun -np 3 -machinefile /work/machines sudo /work/script/hosts.sh
+    * ./data/eqdlm.sh
+    * exit
+    * exit
 
-  * To stop:
-    * To stop the work session please use:
-      *  ./lab.sh stop
+  * To stop the containers:
+    * ./lab.sh stop
 
 <html>
   </td>
