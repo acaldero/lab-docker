@@ -47,9 +47,8 @@
 
   * Example of some work at container **1**:
     * ./lab.sh bash **1**
-    * su - lab
+    * source .profile
     * ./data/quixote.sh
-    * exit
     * exit
 
   * To stop the containers:

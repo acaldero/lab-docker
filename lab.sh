@@ -111,7 +111,7 @@ do
 		# Install on each node
 		CONTAINER_ID_LIST=$(docker ps -f name=docker -q)
 		for C in $CONTAINER_ID_LIST; do
-		    docker container exec -it $C ./script/hosts.sh
+		    docker container exec -it $C /work/script/hosts.sh
 		done
 	     ;;
 
@@ -135,7 +135,7 @@ do
 		# Bash on container...
 		echo "Executing /bin/bash on container $CO_ID..."
 		CO_NAME=$(docker ps -f name=$DOCKER_PREFIX_NAME -q | head -$CO_ID | tail -1)
-		docker exec -it $CO_NAME /bin/bash
+		docker exec -it --user lab $CO_NAME /bin/bash
 	     ;;
 
 	     stop)

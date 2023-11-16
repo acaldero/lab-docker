@@ -6,48 +6,53 @@ ARG GID
 
 ENV DEBIAN_FRONTEND=noninteractive 
 
-# Install initial software
+# Install software: base software
 RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
-        aptitude apt-utils \
+        aptitude apt-utils sudo \
         zlib1g-dev ca-certificates pkg-config \
         software-properties-common gpg-agent \
-        curl libcurl3-dev \
-        wget rsync \
-        sudo lshw \
-        vim \
-        \
-        build-essential \
-        autoconf cmake g++ git \
-        gdb valgrind strace \
-        nasm \
-        man-db doxygen \
-        htop lsof \
+        curl libcurl3-dev wget rsync \
         \
         inetutils-ping \
-        netcat \
         nmap net-tools hping3 \
-        iftop nload \
+        iftop nload lshw \
+        htop lsof \
+        netcat \
         \
         kmod \
         nfs-common nfs-kernel-server \
+        \
+        zip unzip unrar p7zip-full p7zip-rar \
+        \
+        vim \
+        ubuntu-restricted-extras \
+        imagemagick \
+        && \
+    apt-get clean
+
+# Install software: development
+RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
+        build-essential \
+        autoconf automake \
+        make cmake \
+        gcc g++ \
+        gdb valgrind strace \
+        nasm \
+        man-db doxygen git \
         \
         libtool \
 	rpcbind \
         default-jdk \
 	libjson-c-dev \
         jq \
-        \
-        python3-minimal python3-pip \
-        \
-        zip unzip unrar p7zip-full p7zip-rar \
+        yamllint \
         \
         libmpich-dev libmpich12 mpich mpich-doc netpipe-mpich2 \
         \
-        yamllint \
-        ubuntu-restricted-extras \
-        imagemagick \
+        python3-minimal python3-pip \
         && \
     apt-get clean
+
 
 # tzdata: Configure region
 RUN echo "Europe/Madrid" > /etc/timezone
@@ -98,12 +103,20 @@ RUN chown -R lab:lab /home/lab
 RUN pip install py4j
 RUN apt-get install -y jupyter-notebook
 
+# XPN
+RUN mkdir -p /home/lab/src
+RUN cd /home/lab/src; git clone https://github.com/michaelrsweet/mxml.git
+RUN cd /home/lab/src; git clone https://github.com/xpn-arcos/xpn.git
+RUN mkdir -p /home/lab/bin
+RUN cd /home/lab/src/xpn; ./scripts/compile/build-me-xpn.sh  -m /usr/bin/mpicc -i /home/lab/bin
+RUN chown -R lab:lab /home/lab
+
 
 # container start-up
+RUN mkdir -p /work
 RUN mkdir -p /srv
 COPY docker/dockerstart.sh /srv
-RUN mkdir -p /work
-WORKDIR "/work"
+WORKDIR "/home/lab"
 
 EXPOSE 22
 CMD ["/srv/dockerstart.sh"]
