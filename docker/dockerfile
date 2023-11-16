@@ -6,117 +6,44 @@ ARG GID
 
 ENV DEBIAN_FRONTEND=noninteractive 
 
-# Install software: base software
-RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
-        aptitude apt-utils sudo \
-        zlib1g-dev ca-certificates pkg-config \
-        software-properties-common gpg-agent \
-        curl libcurl3-dev wget rsync \
-        \
-        inetutils-ping \
-        nmap net-tools hping3 \
-        iftop nload lshw \
-        htop lsof \
-        netcat \
-        \
-        kmod \
-        nfs-common nfs-kernel-server \
-        \
-        zip unzip unrar p7zip-full p7zip-rar \
-        \
-        vim \
-        ubuntu-restricted-extras \
-        imagemagick \
-        && \
-    apt-get clean
 
-# Install software: development
-RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
-        build-essential \
-        autoconf automake \
-        make cmake \
-        gcc g++ \
-        gdb valgrind strace \
-        nasm \
-        man-db doxygen git \
-        \
-        libtool \
-	rpcbind \
-        default-jdk \
-	libjson-c-dev \
-        jq \
-        yamllint \
-        \
-        libmpich-dev libmpich12 mpich mpich-doc netpipe-mpich2 \
-        \
-        python3-minimal python3-pip \
-        && \
-    apt-get clean
+# A) Install essential software
+COPY scripts/pkg-install/*.sh /tmp
+ RUN  chmod a+x /tmp/*.sh
+ RUN  /tmp/essential-util.sh
+ RUN  /tmp/essential-net.sh
+ RUN  /tmp/essential-build.sh
+ RUN  /tmp/essential-python.sh
 
-
-# tzdata: Configure region
-RUN echo "Europe/Madrid" > /etc/timezone
-
-# Set lab user as default user
+# B) Setup lab user
 RUN addgroup --gid $GID lab && \
     adduser  --uid $UID --gid $GID --disabled-password --gecos "" lab && \
     echo 'lab ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 RUN echo 'lab:lab' | chpasswd
 
+# C) Install SSH (from package)
+COPY scripts/pkg-install/*.sh /tmp
+ RUN  chmod a+x /tmp/*.sh
+ RUN  /tmp/ssh.sh
 
-# OpenSSH: Install
-RUN apt-get install -y --no-install-recommends openssh-client openssh-server
-RUN mkdir -p  /var/run/sshd
-RUN mkdir -p    /home/lab/.ssh
-RUN chmod 700   /home/lab/.ssh
+# D) Install Spark and XPN (from source)
+COPY scripts/src-install/*.sh /tmp
+ RUN  chmod a+x /tmp/*.sh
+ RUN  /tmp/spark.sh /home/lab
+ RUN  /tmp/xpn.sh   /home/lab/src/
 
-# OpenSSH: Allow Root login
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
-RUN sed -i 's/PermitRootLogin prohibit-password/#PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
-RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
-# OpenSSH: Allow to talk to containers without asking for confirmation
-RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \
-    echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
-    mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config
-# OpenSSH: keygen
-RUN ssh-keygen -q -t rsa -N "" -f /home/lab/.ssh/id_rsa
-RUN ssh-keygen -q -t dsa -N "" -f /home/lab/.ssh/id_dsa
-RUN cat /home/lab/.ssh/id_dsa.pub >> /home/lab/.ssh/authorized_keys
-RUN cat /home/lab/.ssh/id_rsa.pub >> /home/lab/.ssh/authorized_keys
-RUN chown lab:lab /home/lab/.ssh
-
-
-# Spark
-RUN mkdir -p /home/lab
-RUN wget https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz -O /home/lab/spark-3.5.tar.gz
-RUN tar zxf /home/lab/spark-3.5.tar.gz     -C /home/lab
-RUN ln -s   /home/lab/spark-3.5.0-bin-hadoop3 /home/lab/spark
-RUN echo "export PATH=/home/lab/spark/bin:\$PATH"  >> /home/lab/.profile
-
-# Scripts
-RUN mkdir -p  /home/lab/bin /home/lab/data
-ADD script    /home/lab/bin
-ADD data      /home/lab/data
+# User initial home
+RUN mkdir -p  /home/lab/bin;  mkdir -p /home/lab/data
+ADD lab-home/bin   /home/lab/bin
+ADD lab-home/data  /home/lab/data
 RUN chmod a+x /home/lab/bin/*.sh /home/lab/data/*.sh
 RUN chown -R lab:lab /home/lab
+WORKDIR "/home/lab"
 
-RUN pip install py4j
-RUN apt-get install -y jupyter-notebook
-
-# XPN
-RUN mkdir -p /home/lab/src
-RUN cd /home/lab/src; git clone https://github.com/michaelrsweet/mxml.git
-RUN cd /home/lab/src; git clone https://github.com/xpn-arcos/xpn.git
-RUN mkdir -p /home/lab/bin
-RUN cd /home/lab/src/xpn; ./scripts/compile/build-me-xpn.sh  -m /usr/bin/mpicc -i /home/lab/bin
-RUN chown -R lab:lab /home/lab
-
-
-# container start-up
+# Container start-up
 RUN mkdir -p /work
 RUN mkdir -p /srv
 COPY docker/dockerstart.sh /srv
-WORKDIR "/home/lab"
 
 EXPOSE 22
 CMD ["/srv/dockerstart.sh"]

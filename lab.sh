@@ -111,7 +111,7 @@ do
 		# Install on each node
 		CONTAINER_ID_LIST=$(docker ps -f name=docker -q)
 		for C in $CONTAINER_ID_LIST; do
-		    docker container exec -it $C /work/script/hosts.sh
+		    docker container exec -it $C /work/lab-home/bin/hosts.sh
 		done
 	     ;;
 
