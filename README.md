@@ -18,22 +18,22 @@
   * First time + "each time u22-dockerfile is updated":
     * ./lab.sh build
 
-  * To start a work session with **3** containers, please execute:
+  * To start a work session with **3** containers:
     *  ./lab.sh start **3**
 
-  * To get into container **2**:
-    *  ./lab.sh bash **2**
+  * To get into container **1**:
+    *  ./lab.sh bash **1**
 
-  * Being within **2**, to exit:
+  * Being in container **1**, to exit:
     *  exit
 
   * To stop the work session please use:
     *  ./lab.sh stop
 
   * Available options for debugging:
-    * To check the containers are running please use:
+    * To check running containers:
       * ./lab.sh status
-    * To get the containers internal IP address please use:
+    * To get the containers internal IP addresses:
       * ./lab.sh network
 
 <html>
@@ -48,8 +48,7 @@
   * Example of some work at container **1**:
     * ./lab.sh bash **1**
     * su - lab
-    * mpirun -np 3 -machinefile /work/machines sudo /work/script/hosts.sh
-    * ./data/eqdlm.sh
+    * ./data/quixote.sh
     * exit
     * exit
 

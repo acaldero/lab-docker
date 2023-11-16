@@ -107,6 +107,12 @@ do
 		  echo       "nodo$I" >> ./export/names
 		  I=$((I+1))
 		done < machines
+
+		# Install on each node
+		CONTAINER_ID_LIST=$(docker ps -f name=docker -q)
+		for C in $CONTAINER_ID_LIST; do
+		    docker container exec -it $C ./script/hosts.sh
+		done
 	     ;;
 
 	     bash)

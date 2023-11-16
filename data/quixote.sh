@@ -31,7 +31,7 @@ rm -fr /home/lab/data/pg2000-w
 # spark cluster
 ./spark/sbin/start-all.sh
 sleep 2
-pyspark < /home/lab/data/eqdlm.py
+pyspark < /home/lab/data/quixote.py
 sleep 3
 ./spark/sbin/stop-all.sh
 
