@@ -14,15 +14,39 @@
   <th>Action</th>
   <th>Command</th>
   </tr>
+
+  <tr>
+  <td> First time + "each time u22-dockerfile is updated"  </td>
+  <td><pre>./lab.sh build</pre>
+  </td>
+  </tr>
+
+  <tr>
+  <td> To start a work session with <b>3</b> containers </td>
+  <td><pre>./lab.sh start <b>3</b></pre>
+  </td>
+  </tr>
+
+  <tr>
+  <td> To get into container <b>1</b>  </td>
+  <td><pre> ./lab.sh bash <b>1</b></pre>
+  </td>
+  </tr>
+
+  <tr>
+  <td> Being in container <b>1</b>, to exit  </td>
+  <td>   <pre>exit</pre>  </td>
+  </tr>
+
+  <tr>
+  <td>To stop the work session please use  </td>
+  <td><pre>./lab.sh stop</pre>
+  </td>
+  </tr>
+
   <tr>
   <td>
 </html>
-
-  * First time + "each time u22-dockerfile is updated"
-  * To start a work session with **3** containers
-  * To get into container **1**
-  * Being in container **1**, to exit
-  * To stop the work session please use
 
   * Available options for debugging:
     * To check running containers:
@@ -32,12 +56,6 @@
   </td>
   <td>
 </html>
-
-  * ./lab.sh build
-  *  ./lab.sh start **3**
-  *  ./lab.sh bash **1**
-  *  exit
-  *  ./lab.sh stop
 
   * Available options for debugging:
     * ./lab.sh status
@@ -62,13 +80,14 @@
   <tr>
   <th>Session</th>
   <th>Example spark</th>
+  <th>Example XPN</th>
   </tr>
 
   <tr>
   <td>
     To start <b>3</b> containers:
   </td>
-  <td>
+  <td colspan="2">
    <pre>
 ./lab.sh start <b>3</b>
 ./lab.sh status
@@ -78,7 +97,7 @@
 
   <tr>
   <td>
-    Example of some work at container <b>1</b>:
+    Some work at container <b>1</b>:
   </td>
   <td>
    <pre>
@@ -88,13 +107,23 @@ source .profile
 exit
    </pre>
   </td>
+  <td>
+   <pre>
+./lab.sh bash <b>1</b>
+source .profile
+/home/lab/src/xpn/xpn -v -n 3 -l /work/export/names  start
+...
+/home/lab/src/xpn/xpn -v -l /work/export/names  stop
+exit
+   </pre>
+  </td>
   </tr>
 
   <tr>
   <td>
      To stop the containers:
   </td>
-  <td>
+  <td colspan="2">
    <pre>
 ./lab.sh stop
    </pre>
