@@ -111,9 +111,7 @@ exit
    <pre>
 ./lab.sh bash <b>1</b>
 source .profile
-/home/lab/src/xpn/xpn -v -n 3 -l /work/export/names  start
-...
-/home/lab/src/xpn/xpn -v -l /work/export/names  stop
+./data/xpn-1.sh
 exit
    </pre>
   </td>
