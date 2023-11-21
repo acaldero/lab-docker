@@ -2,8 +2,8 @@
 
 ## Contents
 
- * [Using lab-docker](https://github.com/acaldero/lab-docker/blob/main/README.md#using-lab-docker)
- * [Some use cases with lab-docker](https://github.com/acaldero/lab-docker/blob/main/README.md#some-use-cases-with-lab-docker)
+ * [Using lab-docker](https://github.com/acaldero/lab-docker/#using-lab-docker)
+ * [Some use cases with lab-docker](https://github.com/acaldero/lab-docker/#some-use-cases-with-lab-docker)
 
 
 ## Using lab-docker
