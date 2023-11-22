@@ -12,7 +12,7 @@ if [ ! -f /home/lab/data/2000-0.txt ]; then
 fi
 
 # replication
-tail -n +2 /work/export/names > /home/lab/spark/conf/workers
+tail -n +2 /work/machines_hosts > /home/lab/spark/conf/workers
 
 LIST=$(cat /home/lab/spark/conf/workers)
 for L in $LIST; do
@@ -31,7 +31,7 @@ rm -fr /home/lab/data/pg2000-w
 # spark cluster
 ./spark/sbin/start-all.sh
 sleep 2
-pyspark < /home/lab/data/quixote.py
+spark-submit /home/lab/data/quixote.py
 sleep 3
 ./spark/sbin/stop-all.sh
 

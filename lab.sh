@@ -21,14 +21,81 @@
 #
 
 
+lab_welcome ()
+{
+	echo ""
+	echo "  Lab-Docker with ubuntu 22.04 (v2.2) "
+	echo " -------------------------------------"
+	echo ""
+}
+
+lab_help ()
+{
+	echo "  Usage: $0 <action> [<options>]"
+	echo ""
+	echo "  : First time, and each time docker/dockerfile is update, please execute:"
+	echo "        $0 build"
+	echo ""
+	echo "  : A typical work session has 3 steps:"
+	echo "    1) First, please start the work session with:"
+	echo "        $0 start <number of containers>"
+	echo "        $0 status"
+	echo "        $0 network"
+	echo "    2) Then you can perform different actions... (see Actions)"
+	echo "    3) Lastly, please stop the work session with:"
+	echo "        $0 stop"
+	echo ""
+	echo "  : Actions:"
+	echo "    : In order to work with a single container, please execute:"
+	echo "        $0 bash <container id, from 1 to number_of_containers>"
+	echo "        <some work within container>"
+	echo "        exit"
+	echo "    : In order to work with all containers, please execute:"
+	echo "        $0 mpirun 2 \"<command>\""
+	echo ""
+	echo "  : Available option to uninstall lab-docker (remove images + containers):"
+	echo "        $0 cleanup"
+	echo ""
+}
+
+lab_machines_create ()
+{
+	# Container cluster (single node) machine list
+	CONTAINER_ID_LIST=$(docker ps -f name=node -q)
+	docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $CONTAINER_ID_LIST > machines_mpi
+
+	# machines_mpi -> machines_hosts + etc_hosts
+	echo -n "" > machines_hosts
+	echo -n "" > etc_hosts
+	I=1
+	while IFS= read -r line
+	do
+	  echo       "nodo$I" >> machines_hosts
+	  echo "$line nodo$I" >> etc_hosts
+	  I=$((I+1))
+	done < machines_mpi
+
+	mkdir -p export/nfs
+}
+
+lab_machines_remove ()
+{
+	rm -fr machines_mpi
+	rm -fr machines_hosts
+	rm -fr etc_hosts
+
+	rmdir -fail-on-non-empty export/nfs/* >& /dev/null
+}
 
 
 #
+# Main
+#
+
 # Usage
-#
-
 if [ $# -eq 0 ]; then
-	$0 help
+	lab_welcome
+	lab_help
 	exit
 fi
 
@@ -52,13 +119,7 @@ fi
 # for each argument, try to execute it
 #
 
- DOCKER_PREFIX_NAME=docker
-#DOCKER_PREFIX_NAME=docker-node
-#DOCKER_PREFIX_NAME=docker_node
-#DOCKER_PREFIX_NAME=docker.node.
-#DOCKER_PREFIX_NAME=mfs-node
-#DOCKER_PREFIX_NAME=$(basename $(pwd))"-node"
-#DOCKER_PREFIX_NAME=$(basename $(pwd))"_node"
+DOCKER_PREFIX_NAME=docker
 mkdir -p export
 
 while (( "$#" ))
@@ -77,7 +138,7 @@ do
 		# Build image
 		echo "Building initial image..."
 		HOST_UID=$(id -u)
-		HOST_GID=$(id -g)
+		HOST_GID=1000
 		docker image build -t u22 --build-arg UID=$HOST_UID --build-arg GID=$HOST_GID -f docker/dockerfile .
 	     ;;
 
@@ -86,7 +147,7 @@ do
 
 		# Start container cluster (single node)
 		echo "Building containers..."
-		HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose -f docker/dockercompose.yml up -d --scale node=$1
+		HOST_UID=$(id -u) HOST_GID=1000 docker-compose -f docker/dockercompose.yml up -d --scale node=$1
 		if [ $? -gt 0 ]; then
 		    echo ": The docker-compose command failed to spin up containers."
 		    echo ": * Did you execute git clone https://github.com/acaldero/lab-docker.git?."
@@ -94,24 +155,13 @@ do
 		    exit
 		fi
 
-		# Container cluster (single node) files: machines, hosts, and names
-		CONTAINER_ID_LIST=$(docker ps -f name=node -q)
-		docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $CONTAINER_ID_LIST > machines
+		# Containers machine file
+		lab_machines_create
 
-		echo -n "" > ./export/hosts
-		echo -n "" > ./export/names
-		I=1
-		while IFS= read -r line
-		do
-		  echo "$line nodo$I" >> ./export/hosts
-		  echo       "nodo$I" >> ./export/names
-		  I=$((I+1))
-		done < machines
-
-		# Install on each node
+		# Update /etc/hosts on each node
 		CONTAINER_ID_LIST=$(docker ps -f name=docker -q)
 		for C in $CONTAINER_ID_LIST; do
-		    docker container exec -it $C /work/lab-home/bin/hosts.sh
+		    docker container exec -it $C /work/lab-home/bin/hosts_update.sh
 		done
 	     ;;
 
@@ -141,7 +191,7 @@ do
 	     stop)
 		# Stopping containers
 		echo "Stopping containers..."
-		HOST_UID=$(id -u) HOST_GID=$(id -g) docker-compose -f docker/dockercompose.yml down
+		HOST_UID=$(id -u) HOST_GID=1000 docker-compose -f docker/dockercompose.yml down
 		if [ $? -gt 0 ]; then
 		    echo ": The docker-compose command failed to stop containers."
 		    echo ": * Did you execute git clone https://github.com/acaldero/lab-docker.git?."
@@ -150,9 +200,7 @@ do
 		fi
 
 		# Remove container cluster (single node) files...
-		rm -fr machines
-		rm -fr export/hosts
-		rm -fr export/names
+		lab_machines_remove
 	     ;;
 
 	     status)
@@ -192,47 +240,20 @@ do
 		    exit
 		fi
 
-		if [ ! -f machines ]; then
-		    echo ": The machines file was not found."
+		if [ ! -f machines_mpi ]; then
+		    echo ": The machines_mpi file was not found."
 		    exit
 		fi
 
 		# U22
 		docker container exec -it $CNAME     \
-		       mpirun -np $NP -machinefile machines \
+		       mpirun -np $NP -machinefile machines_mpi \
 			      $A
 	     ;;
 
 	     help)
-		echo ""
-		echo "  Ubuntu 22.04 on docker (v2.2) "
-		echo " -------------------------------"
-		echo ""
-		echo "  Usage: $0 <action> [<options>]"
-		echo ""
-		echo "  : First time, and each time docker/dockerfile is update, please execute:"
-		echo "        $0 build"
-		echo ""
-		echo "  : A typical work session has 3 steps:"
-		echo "    1) First, please start the work session with:"
-		echo "        $0 start <number of containers>"
-		echo "        $0 status"
-		echo "        $0 network"
-		echo "    2) Then you can perform different actions... (see Actions)"
-		echo "    3) Lastly, please stop the work session with:"
-		echo "        $0 stop"
-		echo ""
-		echo "  : Actions:"
-		echo "    : In order to work with a single container, please execute:"
-		echo "        $0 bash <container id, from 1 to number_of_containers>"
-		echo "        <some work within container>"
-		echo "        exit"
-		echo "    : In order to work with all containers, please execute:"
-	        echo "        $0 mpirun 2 \"<command>\""
-		echo ""
-		echo "  : Available option to uninstall lab-docker (remove images + containers):"
-		echo "        $0 cleanup"
-		echo ""
+		lab_welcome
+		lab_help
 	     ;;
 
 	     *)
