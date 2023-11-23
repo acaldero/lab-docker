@@ -2,9 +2,67 @@
 
 ## Contents
 
- * [Using lab-docker](https://github.com/acaldero/lab-docker/#using-lab-docker)
  * [Some use cases with lab-docker](https://github.com/acaldero/lab-docker/#some-use-cases-with-lab-docker)
+ * [Using lab-docker](https://github.com/acaldero/lab-docker/#using-lab-docker)
 
+
+## Some use cases with lab-docker
+
+<html>
+ <table>
+  <tr>
+  <th>Session</th>
+  <th>Example spark</th>
+  <th>Example XPN</th>
+  </tr>
+
+  <tr>
+  <td>
+    To start <b>3</b> containers:
+  </td>
+  <td colspan="2">
+   <pre>
+./lab.sh start <b>3</b>
+./lab.sh status
+   </pre>
+  </td>
+  </tr>
+
+  <tr>
+  <td>
+    Some work at container <b>1</b>:
+  </td>
+  <td>
+   <pre>
+./lab.sh bash <b>1</b>
+source .profile
+<b>./data/quixote.sh</b>
+exit
+   </pre>
+  </td>
+  <td>
+   <pre>
+./lab.sh bash <b>1</b>
+source .profile
+<b>./data/xpn-mpi.sh</b>
+exit
+   </pre>
+  </td>
+  </tr>
+
+  <tr>
+  <td>
+     To stop the containers:
+  </td>
+  <td colspan="2">
+   <pre>
+./lab.sh stop
+   </pre>
+  </td>
+  </tr>
+
+ </table>
+</html>
 
 ## Using lab-docker
 
@@ -70,66 +128,8 @@
 **Please beware of**:
   * Any modification outside /work will be discarded on container stopping.
   * Please make a backup of your work "frequently".
-  * You might need to use "sudo" before ./lab.sh if your user doesn't belong to the docker group (could be solved by using "sudo usermod -aG docker ${USER}")
-
-
-## Some use cases with lab-docker
-
-<html>
- <table>
-  <tr>
-  <th>Session</th>
-  <th>Example spark</th>
-  <th>Example XPN</th>
-  </tr>
-
-  <tr>
-  <td>
-    To start <b>3</b> containers:
-  </td>
-  <td colspan="2">
-   <pre>
-./lab.sh start <b>3</b>
-./lab.sh status
-   </pre>
-  </td>
-  </tr>
-
-  <tr>
-  <td>
-    Some work at container <b>1</b>:
-  </td>
-  <td>
-   <pre>
-./lab.sh bash <b>1</b>
-source .profile
-./data/quixote.sh
-exit
-   </pre>
-  </td>
-  <td>
-   <pre>
-./lab.sh bash <b>1</b>
-source .profile
-./data/xpn-1.sh
-exit
-   </pre>
-  </td>
-  </tr>
-
-  <tr>
-  <td>
-     To stop the containers:
-  </td>
-  <td colspan="2">
-   <pre>
-./lab.sh stop
-   </pre>
-  </td>
-  </tr>
-
- </table>
-</html>
+  * You might need to use "sudo" before ./lab.sh if your user doesn't belong to the docker group
+    * could be solved by using "sudo usermod -aG docker ${USER}"
 
 
 ## Authors
