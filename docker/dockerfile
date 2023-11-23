@@ -29,9 +29,10 @@ COPY scripts/pkg-install/*.sh /tmp
 # D) Install Spark and XPN (from source)
 COPY scripts/src-install/*.sh /tmp
  RUN  chmod a+x /tmp/*.sh
- RUN  /tmp/spark.sh /home/lab
- RUN  /tmp/mpich.sh /home/lab/src/mpich
- RUN  /tmp/xpn.sh   /home/lab/src/
+ RUN  /tmp/spark.sh   /home/lab
+ RUN  /tmp/hadoop.sh  /home/lab
+ RUN  /tmp/mpich.sh   /home/lab/src/
+ RUN  /tmp/xpn.sh     /home/lab/src/
 
 # User initial home
 RUN mkdir -p  /home/lab/bin;  mkdir -p /home/lab/data

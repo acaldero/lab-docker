@@ -3,39 +3,36 @@ set -x
 
 # 1) Check arguments
 if [ $# -lt 1 ]; then
-	echo "Usage: $0 <full path where software will be installed>"
+	echo "Usage: $0 <full path where software will be downloaded>"
 	exit
 fi
 
 # 2) Clean-up
 DESTINATION_PATH=$1
-mkdir -p ${DESTINATION_PATH}
-mv    -f ${DESTINATION_PATH} ${DESTINATION_PATH}_$$
 
 # 3) Download MPICH
-cd /tmp
+mkdir -p ${DESTINATION_PATH}
+cd       ${DESTINATION_PATH}
 wget https://www.mpich.org/static/downloads/4.1.1/mpich-4.1.1.tar.gz
 tar zxf mpich-4.1.1.tar.gz
-mv mpich-4.1.1 ${DESTINATION_PATH}
-
-if [ ! -d ${DESTINATION_PATH} ]; then
-	echo "MPICH download has failed :-("
-	exit -1
-fi
+ln   -s mpich-4.1.1  mpich
 
 # 4) Install MPICH (from source code)
-pushd .
-cd ${DESTINATION_PATH}
+mkdir -p /home/lab/bin
+cd       ${DESTINATION_PATH}/mpich
 ./configure --prefix=/home/lab/bin/mpich \
+	    --with-device=ch3:sock \
             --enable-threads=multiple \
             --enable-romio \
-            --enable-orterun-prefix-by-default \
 	    --disable-fortran
 make -j $(nproc) all
 make install
 sudo ldconfig
 
-cd examples && \
+cd ${DESTINATION_PATH}/mpich/examples
 make -j $(nproc) all
-popd
+
+# 5) PATH
+echo "# MPICH"                                    >> /home/lab/.profile
+echo "export PATH=/home/lab/bin/mpich/bin:\$PATH" >> /home/lab/.profile
 

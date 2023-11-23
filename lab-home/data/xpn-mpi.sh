@@ -9,7 +9,7 @@ rm -fr /shared/dns.txt
 /home/lab/src/xpn/scripts/execute/mk_conf.sh --conf         /shared/config.xml \
                                              --machinefile  /work/machines_mpi \
                                              --part_size    512k \
-                                             --part_name    xpn \
+                                             --part_name    P1 \
                                              --storage_path /tmp/
 
 # 2) start mpi_servers in background
@@ -19,13 +19,19 @@ mpiexec -np 3 \
 
 sleep 3
 
-# 3) start mpi client
+# 3) start xpn client
 mpiexec -np 1 \
         -hostfile        /work/machines_mpi \
         -genv XPN_DNS    /shared/dns.txt  \
         -genv XPN_CONF   /shared/config.xml \
-        -genv LD_PRELOAD /home/lab/bin/xpn/lib64/xpn_bypass.so:$LD_PRELOAD \
-        /home/lab/src/xpn/test/integrity/xpn/open-write-close
+        /home/lab/src/xpn/test/integrity/xpn/open-write-close 10
+
+#mpiexec -np 1 \
+#        -hostfile        /work/machines_mpi \
+#        -genv XPN_DNS    /shared/dns.txt  \
+#        -genv XPN_CONF   /shared/config.xml \
+#        -genv LD_PRELOAD /home/lab/bin/xpn/lib64/xpn_bypass.so:$LD_PRELOAD \
+#        /home/lab/src/xpn/test/integrity/xpn/open-write-close
 
 
 # 4) stop mpi_servers

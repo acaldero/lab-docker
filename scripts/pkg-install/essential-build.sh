@@ -23,10 +23,7 @@ apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-
         yamllint \
         \
         libmxml1 libmxml-dev \
-        \
 	libmosquitto-dev \
-        \
-        libmpich-dev libmpich12 mpich mpich-doc netpipe-mpich2 \
         \
         libjpeg-dev \
         libpng-dev \
