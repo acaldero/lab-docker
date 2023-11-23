@@ -30,6 +30,7 @@ COPY scripts/pkg-install/*.sh /tmp
 COPY scripts/src-install/*.sh /tmp
  RUN  chmod a+x /tmp/*.sh
  RUN  /tmp/spark.sh /home/lab
+ RUN  /tmp/mpich.sh /home/lab/src/mpich
  RUN  /tmp/xpn.sh   /home/lab/src/
 
 # User initial home
@@ -44,6 +45,7 @@ WORKDIR "/home/lab"
 RUN mkdir -p /work
 RUN mkdir -p /srv
 COPY docker/dockerstart.sh /srv
+RUN  rm -fr /tmp/*.sh
 
 EXPOSE 22
 CMD ["/srv/dockerstart.sh"]
