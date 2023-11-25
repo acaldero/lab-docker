@@ -21,6 +21,6 @@ cd       ${DESTINATION_PATH}/xpn
 ./scripts/compile/build-me-xpn.sh  -m /home/lab/bin/mpich/bin/mpicc  -i /home/lab/bin
 chown -R lab:lab /home/lab
 
-cd ${DESTINATION_PATH}/xpn/test/integrity/xpn
+cd ${DESTINATION_PATH}/xpn/test/performance/xpn
 make -j $(nproc) all
 
