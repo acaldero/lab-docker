@@ -29,34 +29,62 @@ lab_welcome ()
 	echo ""
 }
 
-lab_help ()
+lab_help_b ()
 {
 	echo "  Usage: $0 <action> [<options>]"
 	echo ""
-	echo "  : First time, and each time docker/dockerfile is update, please execute:"
-	echo "        $0 build"
+	echo "  : First time, and each time docker/dockerfile is updated, please execute:"
+	echo "          $0 build"
 	echo ""
 	echo "  : A typical work session has 3 steps:"
 	echo "    1) First, please start the work session with:"
-	echo "        $0 start <number of containers>"
-	echo "        $0 status"
-	echo "        $0 network"
-	echo "    2) Then you can perform different actions... (see Actions)"
+	echo "          $0 start <number of containers>"
+	echo "          $0 status"
+	echo "    2) Then you can...:"
+	echo "       2.1) ...work in a single container:"
+	echo "          $0 bash <container id, from 1 to number_of_containers>"
+	echo "          <some work within container>"
+	echo "          exit"
+	echo "       2.1) ...work on all containers:"
+	echo "          $0 mpirun 2 \"<command>\""
 	echo "    3) Lastly, please stop the work session with:"
-	echo "        $0 stop"
+	echo "          $0 stop"
 	echo ""
-	echo "  : Actions:"
-	echo "    : In order to work with a single container, please execute:"
+	echo "  : Available option to uninstall lab-docker (remove images + containers):"
+	echo "          $0 cleanup"
+	echo ""
+}
+
+lab_help_c ()
+{
+	echo "  Usage: $0 <action> [<options>]"
+	echo ""
+	echo "  : First time + each time docker/dockerfile is updated, please execute:"
+	echo "        $0 build"
+	echo ""
+	echo "  : Example 1 of a typical work session:"
+	echo "    1) Starting the containers:"
+	echo "        $0 start <number of containers>"
+	echo "    2) To work in a single container:"
 	echo "        $0 bash <container id, from 1 to number_of_containers>"
 	echo "        <some work within container>"
 	echo "        exit"
-	echo "    : In order to work with all containers, please execute:"
+	echo "    3) Stopping the containers:"
+	echo "        $0 stop"
+	echo ""
+	echo "  : Example 2 of a typical work session:"
+	echo "    1) Starting the containers:"
+	echo "        $0 start <number of containers>"
+	echo "    2) To execute \"command\" on all containers:"
 	echo "        $0 mpirun 2 \"<command>\""
+	echo "    3) Stopping the containers:"
+	echo "        $0 stop"
 	echo ""
 	echo "  : Available option to uninstall lab-docker (remove images + containers):"
 	echo "        $0 cleanup"
 	echo ""
 }
+
 
 lab_machines_create ()
 {
@@ -95,7 +123,7 @@ lab_machines_remove ()
 # Usage
 if [ $# -eq 0 ]; then
 	lab_welcome
-	lab_help
+	lab_help_c
 	exit
 fi
 
@@ -253,7 +281,7 @@ do
 
 	     help)
 		lab_welcome
-		lab_help
+		lab_help_c
 	     ;;
 
 	     *)

@@ -44,7 +44,7 @@ exit
    <pre>
 ./lab.sh bash <b>1</b>
 source .profile
-<b>./data/xpn-mpi.sh</b>
+<b>./data/xpn-mpi-native.sh</b>
 exit
    </pre>
   </td>
