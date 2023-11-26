@@ -16,6 +16,7 @@ apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-
         \
         kmod \
         nfs-common nfs-kernel-server \
+	fuse libfuse-dev \
         \
         htop lsof lshw strace \
         \

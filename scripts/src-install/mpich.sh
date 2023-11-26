@@ -33,6 +33,7 @@ cd ${DESTINATION_PATH}/mpich/examples
 make -j $(nproc) all
 
 # 5) PATH
-echo "# MPICH"                                    >> /home/lab/.profile
-echo "export PATH=/home/lab/bin/mpich/bin:\$PATH" >> /home/lab/.profile
+echo "# MPICH"                                                          >> /home/lab/.profile
+echo "export PATH=/home/lab/bin/mpich/bin:\$PATH"                       >> /home/lab/.profile
+echo "export LD_LIBRARY_PATH=/home/lab/bin/mpich/lib:\$LD_LIBRARY_PATH" >> /home/lab/.profile
 
