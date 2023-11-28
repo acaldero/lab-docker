@@ -45,14 +45,13 @@ mpiexec -np $NL \
 sleep 3
 
 ## copy data into XPN
-#env LD_PRELOAD=/home/lab/bin/xpn/lib/xpn_bypass.so:/usr/lib/x86_64-linux-gnu/libmxml.so:$LD_PRELOAD \
-#    XPN_CONF=/shared/config.xml \
-#    XPN_DNS=/shared/dns.txt \
-#    cp  /home/lab/data/2000-0.txt  /tmp/expand/P1/2000-0.txt
+export XPN_CONF=/shared/config.xml
+export XPN_DNS=/shared/dns.txt
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libmxml.so:$LD_LIBRARY_PATH
 
-XPN_CONF=/shared/config.xml \
-XPN_DNS=/shared/dns.txt  \
-/home/lab/src/xpn/src/utils/cp-local2xpn /home/lab/data/2000-0.txt /P1/2000-0.txt
+# LD_PRELOAD=/home/lab/bin/xpn/lib/xpn_bypass.so:$LD_PRELOAD  cp  /home/lab/data/2000-0.txt  /tmp/expand/P1/2000-0.txt
+#
+# /home/lab/src/xpn/src/utils/cp-local2xpn /home/lab/data/2000-0.txt /P1/2000-0.txt
 
 
 #
@@ -65,7 +64,7 @@ rm -fr /home/lab/data/pg2000-w
 # spark cluster
 ./spark/sbin/start-all.sh
 sleep 2
-spark-submit /home/lab/data/quixote-xpn.py
+LD_PRELOAD=/home/lab/bin/xpn/lib/xpn_bypass.so:$LD_PRELOAD  spark-submit /home/lab/data/quixote-xpn.py
 sleep 2
 ./spark/sbin/stop-all.sh
 
