@@ -3,12 +3,16 @@ set -x
 
 
 #
-# (0) "source .profile" first
+# (0) Set initial configuration
 #
 
+# source .profile first
 if [[ -z "${PROFILE_LOADED}" ]]; then
   . .profile
 fi
+
+# configure workers (skip first for master)
+tail -n +2 /work/machines_mpi > /home/lab/spark/conf/workers
 
 
 #
@@ -21,8 +25,6 @@ if [ ! -f /home/lab/data/2000-0.txt ]; then
 fi
 
 # replication
-tail -n +2 /work/machines_mpi > /home/lab/spark/conf/workers
-
 ./bin/replicate.sh /home/lab/spark/conf/workers /home/lab/data/2000-0.txt
 
 
@@ -36,7 +38,7 @@ rm -fr /home/lab/data/pg2000-w
 # spark cluster
 ./spark/sbin/start-all.sh
 sleep 2
-spark-submit /home/lab/data/quixote.py
+spark-submit /home/lab/data/quixote-local.py
 sleep 2
 ./spark/sbin/stop-all.sh
 

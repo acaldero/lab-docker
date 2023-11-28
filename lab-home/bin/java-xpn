@@ -1,0 +1,8 @@
+#!/bin/bash
+set -x
+
+env LD_PRELOAD=/home/lab/bin/xpn/lib/xpn_bypass.so:/usr/lib/x86_64-linux-gnu/libmxml.so:$LD_PRELOAD \
+    XPN_CONF=/shared/config.xml  \
+    XPN_DNS=/shared/dns.txt      \
+    /usr/lib/jvm/java-11-openjdk-amd64/bin/java-real "$@"
+
