@@ -36,7 +36,7 @@
    <pre>
 ./lab.sh bash <b>1</b>
 source .profile
-<b>./data/quixote.sh</b>
+<b>./data/quixote-local.sh</b>
 exit
    </pre>
   </td>
