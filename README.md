@@ -10,27 +10,31 @@
 
 <html>
  <table>
+
   <tr>
-  <th>Session</th>
-  <th>Example spark</th>
-  <th>Example XPN</th>
+  <td>
+Example
+  </td>
+  <td>
+To start <b>3</b> containers:
+  </td>
+  <td>
+Some work from container <b>1</b>:
+  </td>
+  <td>
+To stop the containers:
+  </td>
   </tr>
 
   <tr>
   <td>
-    To start <b>3</b> containers:
+Apache Spark
   </td>
-  <td colspan="2">
+  <td rowspan="4">
    <pre>
 ./lab.sh start <b>3</b>
 ./lab.sh status
    </pre>
-  </td>
-  </tr>
-
-  <tr>
-  <td>
-    Some work at container <b>1</b>:
   </td>
   <td>
    <pre>
@@ -39,6 +43,17 @@ source .profile
 <b>./data/quixote-local.sh</b>
 exit
    </pre>
+  </td>
+  <td rowspan="4">
+   <pre>
+./lab.sh stop
+   </pre>
+  </td>
+  </tr>
+
+  <tr>
+  <td>
+Expand (native)
   </td>
   <td>
    <pre>
@@ -52,17 +67,35 @@ exit
 
   <tr>
   <td>
-     To stop the containers:
+Expand (bypass)
   </td>
-  <td colspan="2">
+  <td>
    <pre>
-./lab.sh stop
+./lab.sh bash <b>1</b>
+source .profile
+<b>./data/xpn-mpi-bypass.sh</b>
+exit
+   </pre>
+  </td>
+  </tr>
+
+  <tr>
+  <td>
+Expand (fuse)
+  </td>
+  <td>
+   <pre>
+./lab.sh bash <b>1</b>
+source .profile
+<b>./data/xpn-mpi-fuse.sh</b>
+exit
    </pre>
   </td>
   </tr>
 
  </table>
 </html>
+
 
 ## Using lab-docker
 
