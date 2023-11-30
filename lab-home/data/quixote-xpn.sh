@@ -59,17 +59,17 @@ export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libmxml.so:$LD_LIBRARY_PATH
 #
 
 # clean
-rm -fr /home/lab/data/pg2000-w
+rm -fr /home/lab/data/2000-wc
 
 # spark cluster
 ./spark/sbin/start-all.sh
 sleep 2
-LD_PRELOAD=/home/lab/bin/xpn/lib/xpn_bypass.so:$LD_PRELOAD  spark-submit /home/lab/data/quixote-xpn.py
+LD_PRELOAD=/home/lab/bin/xpn/lib/xpn_bypass.so:$LD_PRELOAD  spark-submit /home/lab/data/quixote.py  --master "spark://nodo1:7077" --minput "/tmp/expand/P1/2000-0.txt" --moutput "/tmp/expand/P1/2000-wc"
 sleep 2
 ./spark/sbin/stop-all.sh
 
 # show results
-ls -als /home/lab/data/pg2000-w
+LD_PRELOAD=/home/lab/bin/xpn/lib/xpn_bypass.so:$LD_PRELOAD  ls -als /tmp/expand/P1/2000-wc
 
 
 #
@@ -78,3 +78,4 @@ ls -als /home/lab/data/pg2000-w
 mpiexec -np 1 \
         -genv XPN_DNS /shared/dns.txt \
         /home/lab/src/xpn/src/mpi_server/xpn_stop_mpi_server -f /work/machines_mpi
+
